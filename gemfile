@@ -1,0 +1,4 @@
+# Gemfile
+
+gem 'opal'
+gem 'opal-browser'
