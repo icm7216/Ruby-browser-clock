@@ -35740,9 +35740,15 @@ if (b == null) b = nil;if (item == null) item = nil;
   function $rb_minus(lhs, rhs) {
     return (typeof(lhs) === 'number' && typeof(rhs) === 'number') ? lhs - rhs : lhs['$-'](rhs);
   }
-  var self = Opal.top, $nesting = [], nil = Opal.nil, $breaker = Opal.breaker, $slice = Opal.slice, $module = Opal.module, $send = Opal.send, $gvars = Opal.gvars;
+  function $rb_plus(lhs, rhs) {
+    return (typeof(lhs) === 'number' && typeof(rhs) === 'number') ? lhs + rhs : lhs['$+'](rhs);
+  }
+  function $rb_divide(lhs, rhs) {
+    return (typeof(lhs) === 'number' && typeof(rhs) === 'number') ? lhs / rhs : lhs['$/'](rhs);
+  }
+  var self = Opal.top, $nesting = [], nil = Opal.nil, $breaker = Opal.breaker, $slice = Opal.slice, $module = Opal.module, $send = Opal.send, $truthy = Opal.truthy, $gvars = Opal.gvars;
 
-  Opal.add_stubs(['$require', '$Native', '$getContext', '$height=', '$-', '$width=', '$backgroundColor=', '$style', '$clearRect', '$fillStyle=', '$font=', '$fillText', '$lambda', '$[]', '$now', '$strftime', '$view', '$update']);
+  Opal.add_stubs(['$require', '$Native', '$getContext', '$height=', '$-', '$width=', '$backgroundColor=', '$style', '$new', '$[]=', '$%', '$+', '$/', '$sum', '$clearRect', '$fillStyle=', '$font=', '$fillText', '$lambda', '$[]', '$now', '$to_f', '$sprintf', '$maf', '$strftime', '$view', '$update']);
   
   self.$require("opal");
   self.$require("browser");
@@ -35752,7 +35758,7 @@ if (b == null) b = nil;if (item == null) item = nil;
   (function($base, $parent_nesting) {
     var $Clock, self = $Clock = $module($base, 'Clock');
 
-    var def = self.$$proto, $nesting = [self].concat($parent_nesting), TMP_Clock_view_1, TMP_Clock_update_3, $writer = nil;
+    var def = self.$$proto, $nesting = [self].concat($parent_nesting), TMP_Clock_maf_1, TMP_Clock_view_2, TMP_Clock_update_4, $writer = nil;
     if (self.canvas == null) self.canvas = nil;
 
     
@@ -35770,7 +35776,27 @@ if (b == null) b = nil;if (item == null) item = nil;
     $writer = ["rgb(3,21,192)"];
     $send(self.canvas.$style(), 'backgroundColor=', Opal.to_a($writer));
     $writer[$rb_minus($writer["length"], 1)];;
-    Opal.defs(self, '$view', TMP_Clock_view_1 = function $$view(time) {
+    Opal.defs(self, '$maf', TMP_Clock_maf_1 = function $$maf(data, tap) {
+      var $a, self = this, $writer = nil;
+      if (self.n == null) self.n = nil;
+      if (self.xn == null) self.xn = nil;
+      if (self.tap == null) self.tap = nil;
+
+      if (tap == null) {
+        tap = 15;
+      }
+      
+      self.tap = tap;
+      self.n = ($truthy($a = self.n) ? $a : 0);
+      self.xn = ($truthy($a = self.xn) ? $a : Opal.const_get_relative($nesting, 'Array').$new(self.tap, 0));
+      
+      $writer = [self.n, data];
+      $send(self.xn, '[]=', Opal.to_a($writer));
+      $writer[$rb_minus($writer["length"], 1)];;
+      self.n = $rb_plus(self.n, 1)['$%'](self.tap);
+      return $rb_divide(self.xn.$sum(), self.tap);
+    }, TMP_Clock_maf_1.$$arity = -2);
+    Opal.defs(self, '$view', TMP_Clock_view_2 = function $$view(time, fps) {
       var self = this, $writer = nil;
       if (self.ctx == null) self.ctx = nil;
 
@@ -35781,25 +35807,34 @@ if (b == null) b = nil;if (item == null) item = nil;
       $send(self.ctx, 'fillStyle=', Opal.to_a($writer));
       $writer[$rb_minus($writer["length"], 1)];;
       
+      $writer = ["30px consolas"];
+      $send(self.ctx, 'font=', Opal.to_a($writer));
+      $writer[$rb_minus($writer["length"], 1)];;
+      self.ctx.$fillText(fps, 10, 30);
+      
       $writer = ["100px consolas"];
       $send(self.ctx, 'font=', Opal.to_a($writer));
       $writer[$rb_minus($writer["length"], 1)];;
       return self.ctx.$fillText(time, 70, 130);
-    }, TMP_Clock_view_1.$$arity = 1);
-    Opal.defs(self, '$update', TMP_Clock_update_3 = function $$update() {
-      var TMP_2, self = this, render = nil;
+    }, TMP_Clock_view_2.$$arity = 2);
+    Opal.defs(self, '$update', TMP_Clock_update_4 = function $$update() {
+      var TMP_3, self = this, render = nil;
 
       
-      render = $send(self, 'lambda', [], (TMP_2 = function(){var self = TMP_2.$$s || this, cur_t = nil, time = nil;
+      render = $send(self, 'lambda', [], (TMP_3 = function(){var self = TMP_3.$$s || this, cur_t = nil, fps_t = nil, fps = nil, time = nil;
+        if (self.pre_t == null) self.pre_t = nil;
         if ($gvars.$ == null) $gvars.$ = nil;
 
       
         $gvars.$['$[]']("requestAnimationFrame")['$[]'](render);
         cur_t = Opal.const_get_relative($nesting, 'Time').$now();
+        fps_t = $rb_divide(1.0, $rb_minus(cur_t.$to_f(), self.pre_t.$to_f()));
+        fps = "" + "FPS: " + (self.$sprintf("%.2f", self.$maf(fps_t)));
         time = cur_t.$strftime("%H:%M:%S.%L");
-        return self.$view(time);}, TMP_2.$$s = self, TMP_2.$$arity = 0, TMP_2));
+        self.pre_t = cur_t;
+        return self.$view(time, fps);}, TMP_3.$$s = self, TMP_3.$$arity = 0, TMP_3));
       return render['$[]']();
-    }, TMP_Clock_update_3.$$arity = 0);
+    }, TMP_Clock_update_4.$$arity = 0);
   })($nesting[0], $nesting);
   return Opal.const_get_relative($nesting, 'Clock').$update();
 })(Opal);
